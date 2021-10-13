@@ -1,0 +1,27 @@
+{
+  "name": "@christoflemke/s3sim",
+  "version": "1.0.0",
+  "description": "Simulate S3",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha ./test/*-test.js"
+  },
+  "author": "Christof Lemke <christoflemke@npmjs.com>",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk-mock": "^5.4.0",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.22",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "^16.10.3",
+    "@types/uuid": "^8.3.1",
+    "aws-sdk": "^2.1005.0",
+    "chai": "^4.3.4",
+    "mocha": "^9.1.2",
+    "nock": "^13.1.3",
+    "ts-standard": "^10.0.0",
+    "typescript": "^4.4.3"
+  }
+}

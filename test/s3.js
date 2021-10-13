@@ -14,7 +14,7 @@ module.exports = function (AWS) {
     },
     /**
      * @param {PutObjectParams} opts
-     * @return {Promise<S3ObjectVersion>}
+     * @return {Promise<PutObjectResponse>}
      */
     putObject: function ({ Bucket, Key, Body }) {
       return S3.putObject({ Bucket, Key, Body }).promise()

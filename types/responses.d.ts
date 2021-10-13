@@ -1,33 +1,47 @@
 interface ListObjectsV2Response {
-    Contents: { Key: string, LastModified: date}[]
+  Contents: Array<{ Key: string, LastModified: Date}>
 }
 
 interface GetObjectResponse {
-    Body: string
+  Body: string
 }
 
 interface DeleteObjectsResponse {
-    Deleted: {
-        Key: string,
-        DeleteMarker?: boolean,
-        VersionId?: string,
-        DeleteMarkerVersionId?: string
-    }[]
-    Errors: []
+  Deleted: Array<{
+    Key: string
+    DeleteMarker?: boolean
+    VersionId?: string
+    DeleteMarkerVersionId?: string
+  }>
+  Errors: []
 }
 
 interface ListObjectVersionsResponse {
-    Versions: {
-        VersionId: string,
-        Key: string,
-        IsLatest: boolean
-    }[]
-    DeleteMarkers: {
-        VersionId: string,
-        IsDeleted: true,
-        Key: string,
-        IsLatest: boolean
-    }[]
+  Versions: Array<{
+    VersionId: string
+    Key: string
+    IsLatest: boolean
+  }>
+  DeleteMarkers: Array<{
+    VersionId: string
+    IsDeleted: true
+    Key: string
+    IsLatest: boolean
+  }>
 }
 
 type PutObjectResponse = S3ObjectVersion
+
+interface CreateBucketResponse {
+  Location: string
+}
+
+interface ListBucketsResponse {
+  Owner: {
+    ID: string
+  }
+  Buckets: Array<{
+    Name: string
+    CreationDate: Date
+  }>
+}

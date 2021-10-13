@@ -4,10 +4,19 @@
   "description": "Simulate S3",
   "main": "index.js",
   "scripts": {
-    "test": "mocha ./test/*-test.js"
+    "test": "mocha ./test/*-test.js",
+    "lint": "ts-standard --fix && tsc"
   },
   "author": "Christof Lemke <christoflemke@npmjs.com>",
   "license": "ISC",
+  "ts-standard": {
+    "env": {
+      "browser": false,
+      "es6": true,
+      "node": true,
+      "mocha": true
+    }
+  },
   "dependencies": {
     "aws-sdk-mock": "^5.4.0",
     "uuid": "^8.3.2"

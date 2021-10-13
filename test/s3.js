@@ -1,44 +1,74 @@
 // @ts-nocheck
 module.exports = function (AWS) {
   const S3 = new AWS.S3({
-    region: process.env.AWS_DEFAULT_REGION,
+    region: process.env.AWS_DEFAULT_REGION
   })
 
   return {
     /**
+     * @param {PutBucketVersioningParam} opts
+     */
+    putBucketVersioning (opts) {
+      return S3.putBucketVersioning(opts)
+    },
+    /**
+     * @return {Promise<ListBucketsResponse>}
+     */
+    listBuckets () {
+      return S3.listBuckets().promise()
+    },
+    /**
+     * @param {DeleteBucketParams} opts
+     * @return Promise<void>
+     */
+    deleteBucket (opts) {
+      return S3.deleteBucket(opts).promise()
+    },
+    /**
+     *
+     * @param {CreateBucketParams} opts
+     * @return Promise<CreateBucketResponse>
+     */
+    createBucket (opts) {
+      if (!opts.ACL) {
+        opts.ACL = 'private'
+      }
+      return S3.createBucket(opts).promise()
+    },
+    /**
      * @param {GetObjectParams} opts
      * @return {Promise<GetObjectResponse>}
      */
-    getObject: function ({ Bucket, Key }) {
-      return S3.getObject({ Bucket, Key }).promise()
+    getObject: function (opts) {
+      return S3.getObject(opts).promise()
     },
     /**
      * @param {PutObjectParams} opts
      * @return {Promise<PutObjectResponse>}
      */
-    putObject: function ({ Bucket, Key, Body }) {
-      return S3.putObject({ Bucket, Key, Body }).promise()
+    putObject: function (opts) {
+      return S3.putObject(opts).promise()
     },
     /**
      * @param {ListObjectsV2Params} opts
-     * @return {Promise<ListObjectV2Response>}
+     * @return {Promise<ListObjectsV2Response>}
      */
-    listObjectsV2: function ({ Bucket, Prefix }) {
-      return S3.listObjectsV2({ Bucket, Prefix }).promise()
+    listObjectsV2: function (opts) {
+      return S3.listObjectsV2(opts).promise()
     },
     /**
      * @param {ListObjectVersionsParams} opts
      * @return {Promise<ListObjectVersionsResponse>}
      */
-    listObjectVersions: function ({ Bucket, Prefix }) {
-      return S3.listObjectVersions({ Bucket, Prefix }).promise()
+    listObjectVersions: function (opts) {
+      return S3.listObjectVersions(opts).promise()
     },
     /**
      * @param {DeleteObjectsParams} opts
      * @return {Promise<DeleteObjectsResponse>}
      */
-    deleteObjects: function ({Bucket, Delete}) {
-      return S3.deleteObjects({Bucket, Delete}).promise()
+    deleteObjects: function (opts) {
+      return S3.deleteObjects(opts).promise()
     }
   }
 }

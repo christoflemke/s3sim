@@ -45,3 +45,7 @@ interface ListBucketsResponse {
     CreationDate: Date
   }>
 }
+
+interface PutObjectTaggingResponse {
+  VersionId: string
+}

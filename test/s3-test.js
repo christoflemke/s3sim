@@ -14,7 +14,8 @@ const {
   createBucket,
   deleteBucket,
   listBuckets,
-  deleteObject
+  deleteObject,
+  putObjectTagging
 } = require('./s3')(AWS)
 const uuid = require('uuid')
 
@@ -89,14 +90,20 @@ describe(`S3 mocked: ${mocked}`, () => {
   describe('with bucket', () => {
     const Bucket = 'christoflemke-s3sim-test-bucket'
 
+    /**
+     * @return {Promise<{VersionId: string, Key: string}>}
+     */
     async function createFile () {
       const Key = uuid.v4()
-      await putObject({
+      const response = await putObject({
         Bucket,
         Key,
         Body: 'foo'
       })
-      return Key
+      return {
+        Key,
+        VersionId: response.VersionId
+      }
     }
 
     beforeEach(async () => {
@@ -119,7 +126,7 @@ describe(`S3 mocked: ${mocked}`, () => {
 
     describe('getObject', () => {
       it('can get objects', async () => {
-        const Key = await createFile()
+        const { Key } = await createFile()
 
         const response = await getObject({
           Bucket,
@@ -186,7 +193,7 @@ describe(`S3 mocked: ${mocked}`, () => {
 
     describe('listObjectsV2', async () => {
       it('can list objects', async () => {
-        const Key = await createFile()
+        const { Key } = await createFile()
         const response = await listObjectsV2({ Bucket, Prefix: Key })
 
         expect(response.Contents.length).to.eq(1)
@@ -209,12 +216,18 @@ describe(`S3 mocked: ${mocked}`, () => {
 
     describe('listObjectVersions', async () => {
       it('can list versions', async () => {
-        const Key = await createFile()
+        const { Key } = await createFile()
         await putObject({ Bucket, Key, Body: 'bar' })
 
         const response = await listObjectVersions({ Bucket, Prefix: Key })
 
         expect(response.Versions.length).to.eq(2)
+      })
+
+      it('returns an empty list if none match', async () => {
+        const response = await listObjectVersions({ Bucket, Prefix: uuid.v4() })
+
+        expect(response.Versions.length).to.eq(0)
       })
 
       it('throws NoSuchBucket if bucket does not exist', async () => {
@@ -231,7 +244,7 @@ describe(`S3 mocked: ${mocked}`, () => {
 
     describe('deleteObjects', async () => {
       it('can delete objects', async () => {
-        const Key = await createFile()
+        const { Key } = await createFile()
 
         const Delete = { Objects: [{ Key }] }
         const response = await deleteObjects({ Bucket, Delete })
@@ -246,7 +259,7 @@ describe(`S3 mocked: ${mocked}`, () => {
       })
 
       it('can delete versions', async () => {
-        const Key = await createFile()
+        const { Key } = await createFile()
         const response = await putObject({ Bucket, Key, Body: 'bar' })
 
         const Delete = { Objects: [{ Key, VersionId: response.VersionId }] }
@@ -290,16 +303,55 @@ describe(`S3 mocked: ${mocked}`, () => {
 
     describe('deleteObject', () => {
       it('can delete objects', async () => {
-        const Key = await createFile()
+        const { Key } = await createFile()
 
         await deleteObject({ Bucket, Key })
       })
 
       it('can delete versions', async () => {
-        const Key = await createFile()
+        const { Key } = await createFile()
         const { VersionId } = await putObject({ Bucket, Key, Body: 'bar' })
 
         await deleteObject({ Bucket, Key, VersionId })
+      })
+    })
+
+    describe('putObjectTagging', () => {
+      const Tagging = { TagSet: [{ Key: 'foo', Value: 'Bar' }] }
+      it('adds tags to objects', async () => {
+        const { Key } = await createFile()
+
+        const response = await putObjectTagging({ Bucket, Key, Tagging })
+
+        expect(response.VersionId).to.be.a('String')
+      })
+
+      it('throws NoSuchKey if the object does not exist', async () => {
+        try {
+          await putObjectTagging({ Bucket, Key: uuid.v4(), Tagging })
+          expect.fail('Should fail with no such key')
+        } catch ({ code }) {
+          expect(code).to.eq('NoSuchKey')
+        }
+      })
+
+      it('allows tagging of specific versions', async () => {
+        const { Key, VersionId } = await createFile()
+
+        const response = await putObjectTagging({ Bucket, Key, VersionId, Tagging })
+
+        expect(response.VersionId).to.eq(VersionId)
+      })
+
+      it('throws if the version is not found', async () => {
+        const { Key } = await createFile()
+        try {
+          await putObjectTagging({ Bucket, Key, VersionId: uuid.v4(), Tagging })
+          expect.fail('Should fail with no such key')
+        } catch ({ code, message }) {
+          expect(code).to.eq('InvalidArgument')
+          expect(message).to.eq('Invalid version id specified')
+        }
       })
     })
   })

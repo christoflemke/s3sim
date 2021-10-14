@@ -49,3 +49,14 @@ interface PutBucketVersioningParam extends Params {
     Status?: 'Enabled'|'Suspended'|string
   }
 }
+
+interface PutObjectTaggingParams extends Params {
+  Key: string
+  VersionId?: string
+  Tagging: {
+    TagSet: Array<{
+      Key: string
+      Value: string
+    }>
+  }
+}

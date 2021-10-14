@@ -16,11 +16,12 @@ interface S3Object {
   versions: S3ObjectVersion[]
 }
 
-type S3ObjectVersion = S3DeletedObjectVersion | S3ActiveObjectVersion
+type S3ObjectVersion = S3ActiveObjectVersion | S3DeletedObjectVersion
 
 interface S3DeletedObjectVersion {
   IsDeleted: true
   VersionId: string
+  Tags: VersionTag[]
 }
 
 interface S3ActiveObjectVersion {
@@ -28,4 +29,10 @@ interface S3ActiveObjectVersion {
   Content: string
   VersionId: string
   ETag: string
+  Tags: VersionTag[]
+}
+
+interface VersionTag {
+  Key: string
+  Value: string
 }

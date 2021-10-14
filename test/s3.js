@@ -1,4 +1,3 @@
-// @ts-nocheck
 module.exports = function (AWS) {
   const S3 = new AWS.S3({
     region: process.env.AWS_DEFAULT_REGION
@@ -76,6 +75,13 @@ module.exports = function (AWS) {
      */
     deleteObject: function (opts) {
       return S3.deleteObject(opts).promise()
+    },
+    /**
+     * @param {PutObjectTaggingParams} opts
+     * @return {Promise<PutObjectTaggingResponse>}
+     */
+    putObjectTagging: function (opts) {
+      return S3.putObjectTagging(opts).promise()
     }
   }
 }

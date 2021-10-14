@@ -13,10 +13,10 @@ const {
   deleteObjects,
   createBucket,
   deleteBucket,
-  listBuckets
+  listBuckets,
+  deleteObject
 } = require('./s3')(AWS)
 const uuid = require('uuid')
-
 const mocked = [true, false]
 
 mocked.forEach(mocked => {
@@ -52,6 +52,15 @@ mocked.forEach(mocked => {
         await createBucket({ Bucket })
 
         await deleteBucket({ Bucket })
+      })
+
+      it('will throw if the bucket does not exist', async () => {
+        try {
+          await deleteBucket({ Bucket: uuid.v4() })
+          expect.fail('Should fail with NoSuchBucket')
+        } catch ({ code }) {
+          expect(code).to.eq('NoSuchBucket')
+        }
       })
     })
 
@@ -138,7 +147,7 @@ mocked.forEach(mocked => {
               Bucket: uuid.v4(),
               Key: uuid.v4()
             })
-            expect.fail('Shuold fail with NoSuchBucket')
+            expect.fail('Should fail with NoSuchBucket')
           } catch ({ code }) {
             expect(code).to.eq('NoSuchBucket')
           }
@@ -168,7 +177,7 @@ mocked.forEach(mocked => {
               Key: uuid.v4(),
               Body: 'foo'
             })
-            expect.fail('Shuold fail with NoSuchBucket')
+            expect.fail('Should fail with NoSuchBucket')
           } catch ({ code }) {
             expect(code).to.eq('NoSuchBucket')
           }
@@ -185,6 +194,17 @@ mocked.forEach(mocked => {
           expect(response.Contents[0].Key).to.eq(Key)
           expect(response.Contents[0].LastModified).to.be.a('Date')
         })
+
+        it('throws NoSuchBucket if bucket does not exist', async () => {
+          try {
+            await listObjectsV2({
+              Bucket: uuid.v4()
+            })
+            expect.fail('Should fail with NoSuchBucket')
+          } catch ({ code }) {
+            expect(code).to.eq('NoSuchBucket')
+          }
+        })
       })
 
       describe('listObjectVersions', async () => {
@@ -195,6 +215,17 @@ mocked.forEach(mocked => {
           const response = await listObjectVersions({ Bucket, Prefix: Key })
 
           expect(response.Versions.length).to.eq(2)
+        })
+
+        it('throws NoSuchBucket if bucket does not exist', async () => {
+          try {
+            await listObjectVersions({
+              Bucket: uuid.v4()
+            })
+            expect.fail('Should fail with NoSuchBucket')
+          } catch ({ code }) {
+            expect(code).to.eq('NoSuchBucket')
+          }
         })
       })
 
@@ -230,6 +261,45 @@ mocked.forEach(mocked => {
           expect(deleteResponse.Errors.length).to.eq(0)
           const getResponse = await getObject({ Bucket, Key })
           expect(getResponse.Body.toString()).to.eq('foo')
+        })
+
+        it('creates a delete marker for objects that do not exits', async () => {
+          const response = await deleteObjects({
+            Bucket,
+            Delete: { Objects: [{ Key: uuid.v4() }] }
+          })
+          expect(response.Deleted).to.be.an('Array')
+          expect(response.Deleted.length).to.eq(1)
+          expect(response.Deleted[0].Key).to.be.a('String')
+          expect(response.Deleted[0].DeleteMarker).to.eq(true)
+          expect(response.Deleted[0].DeleteMarkerVersionId).to.be.a('String')
+        })
+
+        it('throws NoSuchBucket if bucket does not exist', async () => {
+          try {
+            await deleteObjects({
+              Bucket: uuid.v4(),
+              Delete: { Objects: [] }
+            })
+            expect.fail('Should fail with NoSuchBucket')
+          } catch ({ code }) {
+            expect(code).to.eq('NoSuchBucket')
+          }
+        })
+      })
+
+      describe('deleteObject', () => {
+        it('can delete objects', async () => {
+          const Key = await createFile()
+
+          await deleteObject({ Bucket, Key })
+        })
+
+        it('can delete versions', async () => {
+          const Key = await createFile()
+          const { VersionId } = await putObject({ Bucket, Key, Body: 'bar' })
+
+          await deleteObject({ Bucket, Key, VersionId })
         })
       })
     })

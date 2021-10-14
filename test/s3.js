@@ -69,6 +69,13 @@ module.exports = function (AWS) {
      */
     deleteObjects: function (opts) {
       return S3.deleteObjects(opts).promise()
+    },
+    /**
+     * @param {DeleteObjectParams} opts
+     * @return {Promise<void>}
+     */
+    deleteObject: function (opts) {
+      return S3.deleteObject(opts).promise()
     }
   }
 }

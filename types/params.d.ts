@@ -26,6 +26,11 @@ interface DeleteObjectsParams extends Params {
   Delete: { Objects: DeleteParam[] }
 }
 
+interface DeleteObjectParams extends Params {
+  Key: string
+  VersionId?: string
+}
+
 interface CreateBucketParams extends Params {
   ACL?: 'private' | 'public-read' | 'public-read-write' | 'authenticated-read'
   CreateBucketConfiguration?: {

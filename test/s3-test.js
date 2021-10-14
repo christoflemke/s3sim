@@ -15,7 +15,8 @@ const {
   deleteBucket,
   listBuckets,
   deleteObject,
-  putObjectTagging
+  putObjectTagging,
+  getObjectTagging
 } = require('./s3')(AWS)
 const uuid = require('uuid')
 
@@ -352,6 +353,18 @@ describe(`S3 mocked: ${mocked}`, () => {
           expect(code).to.eq('InvalidArgument')
           expect(message).to.eq('Invalid version id specified')
         }
+      })
+    })
+    describe('getObjectTagging', () => {
+      it('returns the object tagging', async () => {
+        const { Key } = await createFile()
+        await putObjectTagging({ Bucket, Key, Tagging: { TagSet: [{ Key: 'foo', Value: 'bar' }] } })
+
+        const response = await getObjectTagging({ Bucket, Key })
+        console.log(response)
+        expect(response.VersionId).to.be.a('String')
+        expect(response.TagSet).to.be.an('Array')
+        expect(response.TagSet).to.deep.include({ Key: 'foo', Value: 'bar' })
       })
     })
   })

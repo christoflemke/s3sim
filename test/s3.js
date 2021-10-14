@@ -82,6 +82,13 @@ module.exports = function (AWS) {
      */
     putObjectTagging: function (opts) {
       return S3.putObjectTagging(opts).promise()
+    },
+    /**
+     * @param {GetObjectTaggingParams} opts
+     * @return {Promise<GetObjectTaggingResponse>}
+     */
+    getObjectTagging: function (opts) {
+      return S3.getObjectTagging(opts).promise()
     }
   }
 }

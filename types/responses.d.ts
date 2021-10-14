@@ -49,3 +49,11 @@ interface ListBucketsResponse {
 interface PutObjectTaggingResponse {
   VersionId: string
 }
+
+interface GetObjectTaggingResponse {
+  VersionId: string
+  TagSet: Array<{
+    Key: string
+    Value: string
+  }>
+}

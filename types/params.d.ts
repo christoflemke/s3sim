@@ -60,3 +60,8 @@ interface PutObjectTaggingParams extends Params {
     }>
   }
 }
+
+interface GetObjectTaggingParams extends Params {
+  Key: string
+  VersionId?: string
+}

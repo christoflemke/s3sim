@@ -4,7 +4,7 @@
   "description": "Simulate S3",
   "main": "index.js",
   "scripts": {
-    "test": "mocha ./test/*-test.js",
+    "test": "MOCKED=true mocha ./test/*-test.js",
     "lint": "ts-standard --fix && tsc"
   },
   "author": "Christof Lemke <christof.lemke@gmail.com>",
@@ -27,7 +27,7 @@
   "devDependencies": {
     "@types/chai": "^4.2.22",
     "@types/mocha": "^9.0.0",
-    "@types/node": "^16.10.3",
+    "@types/node": "^14.17.26",
     "@types/uuid": "^8.3.1",
     "aws-sdk": "^2.1005.0",
     "chai": "^4.3.4",

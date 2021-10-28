@@ -4,7 +4,12 @@ const expect = require('chai').expect
 
 const s3sim = require('../lib/s3sim')
 const nock = require('nock')
-s3sim.mock(AWS)
+
+const mocked = !!process.env.MOCKED
+if (mocked) {
+  s3sim.mock(AWS)
+  nock.disableNetConnect()
+}
 const {
   getObject,
   putObject,
@@ -20,17 +25,7 @@ const {
 } = require('./s3')(AWS)
 const uuid = require('uuid')
 
-const mocked = !!process.env.MOCKED
-
 describe(`S3 mocked: ${mocked}`, () => {
-  beforeEach(async () => {
-    if (mocked) {
-      nock.disableNetConnect()
-    } else {
-      s3sim.reset()
-      nock.restore()
-    }
-  })
 
   describe('createBucket', () => {
     it('creates a bucket', async () => {
